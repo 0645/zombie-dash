@@ -239,6 +239,7 @@ void Penelope::useCharge()
             else
                 break;
         }
+        getWorld()->playSound(SOUND_PLAYER_FIRE);
         nCharges--;
     }
 }
@@ -252,8 +253,13 @@ void Penelope::useLandmine()
     }
 }
 
-void Penelope::becomeZombie() { setDead(); }
-void Penelope::damage() { setDead(); }
+void Penelope::becomeZombie() { damage(); }
+
+void Penelope::damage()
+{
+    getWorld()->playSound(SOUND_PLAYER_DIE);
+    setDead();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -306,6 +312,7 @@ void Goodie::doSomething()
 
 void Goodie::rewardPlayer()
 {
+    getWorld()->playSound(SOUND_GOT_GOODIE);
     getWorld()->increaseScore(50);
     giveToPlayer();
 }
@@ -419,6 +426,7 @@ void Landmine::damage()
                 getWorld()->spawnFlame(dest_x, dest_y, up);
         }
     }
+    getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
     getWorld()->spawnPit(getX(), getY());
 
     setDead();
@@ -464,12 +472,14 @@ bool Zombie::vomit()
         if(getWorld()->playerOverlaps(vomit_x, vomit_y))
         {
             getWorld()->spawnVomit(vomit_x, vomit_y, direction);
+            getWorld()->playSound(SOUND_ZOMBIE_VOMIT);
             return true;
         }
         
         if(getWorld()->anyOverlappingCitizensAt(vomit_x, vomit_y))
         {
             getWorld()->spawnVomit(vomit_x, vomit_y, direction);
+            getWorld()->playSound(SOUND_ZOMBIE_VOMIT);
             return true;
         }
     }
@@ -481,6 +491,8 @@ void Zombie::damage()
 {
     if(!isAlive())
         return;
+    
+    getWorld()->playSound(SOUND_ZOMBIE_DIE);
     rewardPlayer();
     setDead();
 }
@@ -560,13 +572,23 @@ Citizen::Citizen(double startX, double startY, StudentWorld * world)
 
 void Citizen::damage()
 {
+    getWorld()->playSound(SOUND_CITIZEN_DIE);
     getWorld()->increaseScore(-1000);
     setDead();
 }
 
+void Citizen::infect()
+{
+    getWorld()->playSound(SOUND_CITIZEN_INFECTED);
+    Person::infect();
+}
+
 void Citizen::becomeZombie()
 {
-    damage();
+    getWorld()->playSound(SOUND_ZOMBIE_BORN);
+    getWorld()->increaseScore(-1000);
+    setDead();
+
     if(randInt(1, 100) <= 70)
         getWorld()->spawnDumbZombie(getX(), getY());
     else

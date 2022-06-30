@@ -92,6 +92,7 @@ class Citizen: public Person
 public:
     Citizen(double startX, double startY, StudentWorld * world);
     virtual void damage();
+    virtual void infect();
     virtual void rewardPlayer();
     virtual void doSomething();
 private:

@@ -90,7 +90,10 @@ int StudentWorld::move()
             auto actor = *i;
             bool isExit = (!actor->blocksMovement() && actor->blocksFlames());
             if(isExit && actor->overlaps(player))
-                return GWSTATUS_FINISHED_LEVEL;   
+            {
+                playSound(SOUND_LEVEL_FINISHED);
+                return GWSTATUS_FINISHED_LEVEL;
+            }
         }
     }
     
@@ -209,6 +212,7 @@ void StudentWorld::doSomethingToActorsAt(int x, int y, std::string action, Actor
                 actor->infect();
             else if(action == "save")
             {
+                playSound(SOUND_CITIZEN_SAVED);
                 actor->rewardPlayer();
                 actor->setDead();
             }
